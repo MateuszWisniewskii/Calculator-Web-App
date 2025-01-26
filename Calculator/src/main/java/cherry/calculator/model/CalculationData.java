@@ -8,7 +8,7 @@ package cherry.calculator.model;
  *
  * @author mdw18
  */
-class CalculationData {
+public class CalculationData {
 
     private int id;
     private double firstNumber, secondNumber, resultNumber;
