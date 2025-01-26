@@ -2,31 +2,32 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package pl.polsl.calculator.model;
+package cherry.calculator.model;
 
 /**
  *
  * @author mdw18
  */
-public class CalculationData {
+class CalculationData {
 
     private int id;
-    private double firstNumber, secondNumber, result;
+    private double firstNumber, secondNumber, resultNumber;
     private String operator;
 
-    public CalculationData(int id, double firstNumber, String operator, double secondNumber, double result) {
+    public CalculationData(int id, double firstNumber, double secondNumber, double resultNumber, String operator) {
         this.id = id;
         this.firstNumber = firstNumber;
         this.secondNumber = secondNumber;
-        this.result = result;
+        this.resultNumber = resultNumber;
         this.operator = operator;
     }
 
-    public CalculationData(double firstNumber, double secondNumber, double result, String operator) {
-        this.firstNumber = firstNumber;
-        this.secondNumber = secondNumber;
-        this.result = result;
-        this.operator = operator;
+    public CalculationData() {
+        this.id = 0;
+        this.firstNumber = 0;
+        this.secondNumber = 0;
+        this.resultNumber = 0;
+        this.operator = "+";
     }
 
     public int getId() {
@@ -53,12 +54,12 @@ public class CalculationData {
         this.secondNumber = secondNumber;
     }
 
-    public double getResult() {
-        return result;
+    public double getResultNumber() {
+        return resultNumber;
     }
 
-    public void setResult(double result) {
-        this.result = result;
+    public void setResultNumber(double resultNumber) {
+        this.resultNumber = resultNumber;
     }
 
     public String getOperator() {
@@ -68,5 +69,7 @@ public class CalculationData {
     public void setOperator(String operator) {
         this.operator = operator;
     }
+    
+    
 
 }
