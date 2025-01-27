@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package cherry.calculator.servlet;
 
 import cherry.calculator.model.CalculationData;
@@ -18,18 +14,22 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- *
- * @author mdw18
+ * Servlet that handles calculation requests, performs the calculation, 
+ * stores the result, and displays it to the user. It also maintains a 
+ * calculation count using cookies.
+ * 
+ * @author Mateusz Wiśniewski
  */
 @WebServlet(name = "CalculatorServlet", urlPatterns = {"/CalculatorServlet"})
 public class CalculatorServlet extends HttpServlet {
 
     /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
+     * Processes both HTTP <code>GET</code> and <code>POST</code> requests.
+     * Performs calculations, validates input, stores results in the application's data source, 
+     * and tracks the calculation count using cookies.
      *
-     * @param request servlet request
-     * @param response servlet response
+     * @param request the HTTP request object
+     * @param response the HTTP response object
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
@@ -37,56 +37,89 @@ public class CalculatorServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
 
+        // Retrieve or initialize the "calculationsCount" cookie
         Cookie c = null;
-        Cookie[] ck = request.getCookies();
-        if (ck != null) {
-            for (Cookie cookie : ck) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
                 if ("calculationsCount".equals(cookie.getName())) {
                     c = cookie;
+                    break;
                 }
             }
         }
-        int id = c == null ? 1 : Integer.parseInt(c.getValue()) + 1;
 
+        // Set the ID based on the cookie value or start from 1 if no cookie exists
+        int id = (c == null) ? 1 : Integer.parseInt(c.getValue()) + 1;
+
+        // Retrieve the application's data source from the servlet context
         ServletContext context = request.getServletContext();
         DataSource dataSource = (DataSource) context.getAttribute("DataSource");
 
+        // Get parameters from the request
         String firstNumberParam = request.getParameter("firstNumber");
         String secondNumberParam = request.getParameter("secondNumber");
         String operator = request.getParameter("operator");
 
-        double firstNumber = Double.parseDouble(firstNumberParam);
-        double secondNumber = Double.parseDouble(secondNumberParam);
+        try (PrintWriter out = response.getWriter()) {
+            // Validate the parameters
+            if (firstNumberParam == null || secondNumberParam == null || operator == null) {
+                out.println("<h1>Error: All fields must be filled.</h1>");
+                return;
+            }
 
-        CalculatorModel calculator = new CalculatorModel(firstNumber, secondNumber, operator);
+            // Parse the numbers
+            double firstNumber;
+            double secondNumber;
+            try {
+                firstNumber = Double.parseDouble(firstNumberParam);
+                secondNumber = Double.parseDouble(secondNumberParam);
+            } catch (NumberFormatException e) {
+                out.println("<h1>Error: The inputs must be numeric values.</h1>");
+                return;
+            }
 
-        dataSource.persistObject(new CalculationData(id, calculator.getFirstNumber(),
-                calculator.getSecondNumber(), calculator.getResultNumber(), calculator.getOperator()));
+            // Perform the calculation
+            CalculatorModel calculator = new CalculatorModel(firstNumber, secondNumber, operator);
 
-        PrintWriter out = response.getWriter();
-        response.addCookie(new Cookie("calculationsCount", Integer.toString(id)));
+            // Store the result in the application's data source
+            CalculationData calculationData = new CalculationData(
+                    id,
+                    calculator.getFirstNumber(),
+                    calculator.getSecondNumber(),
+                    calculator.getResultNumber(),
+                    calculator.getOperator()
+            );
+            dataSource.persistObject(calculationData);
 
-        out.println("<!DOCTYPE html>");
-        out.println("<html>");
-        out.println("<head>");
-        out.println("<title>Wynik Kalkulatora</title>");
-        out.println("</head>");
-        out.println("<body>");
-        out.println("<h1>Wynik Kalkulatora</h1>");
-        out.println("<p>Liczba 1: " + firstNumber + "</p>");
-        out.println("<p>Operator: " + operator + "</p>");
-        out.println("<p>Liczba 2: " + secondNumber + "</p>");
-        out.println("<p><strong>Wynik: " + calculator.getResultNumber() + "</strong></p>");
-        out.println("</body>");
-        out.println("</html>");
+            // Add or update the "calculationsCount" cookie
+            response.addCookie(new Cookie("calculationsCount", Integer.toString(id)));
+
+            // Generate the response with the result
+            out.println("<!DOCTYPE html>");
+            out.println("<html>");
+            out.println("<head><title>Calculator Result</title></head>");
+            out.println("<body>");
+            out.println("<h1>Calculator Result</h1>");
+            out.println("<p>Number 1: " + firstNumber + "</p>");
+            out.println("<p>Operator: " + operator + "</p>");
+            out.println("<p>Number 2: " + secondNumber + "</p>");
+            out.println("<p><strong>Result: " + calculator.getResultNumber() + "</strong></p>");
+            out.println("<a href='history.html'><button>View History</button></a>");
+            out.println("</body>");
+            out.println("</html>");
+        } catch (Exception e) {
+            response.getWriter().println("<h1>An error occurred: " + e.getMessage() + "</h1>");
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
+     * Forwards the request to {@link #processRequest(HttpServletRequest, HttpServletResponse)}.
      *
-     * @param request servlet request
-     * @param response servlet response
+     * @param request the HTTP request object
+     * @param response the HTTP response object
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
@@ -98,9 +131,10 @@ public class CalculatorServlet extends HttpServlet {
 
     /**
      * Handles the HTTP <code>POST</code> method.
+     * Forwards the request to {@link #processRequest(HttpServletRequest, HttpServletResponse)}.
      *
-     * @param request servlet request
-     * @param response servlet response
+     * @param request the HTTP request object
+     * @param response the HTTP response object
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
@@ -113,11 +147,11 @@ public class CalculatorServlet extends HttpServlet {
     /**
      * Returns a short description of the servlet.
      *
-     * @return a String containing servlet description
+     * @return A string containing a description of the servlet.
      */
     @Override
     public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
+        return "Servlet for performing calculations and storing results.";
+    }
+    // </editor-fold>
 }

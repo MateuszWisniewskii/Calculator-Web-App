@@ -5,24 +5,25 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
 -->
 <html>
     <head>
-        <title>TODO supply a title</title>
+        <title>Historia Obliczeń</title>
         <meta charset="UTF-8">
         <script src="js/historyScript.js"></script>
+        <link rel="stylesheet" href="css/historyStyle.css" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
-    <body onload="getHistory('HistoryTable');">
-         <h1>History List</h1>
-        <table>
-            <thead>                
-                <tr>
-                    <th>Id</th>
-                    <th>Pierwszy argument</th>
-                    <th>Operator</th>
-                    <th>Drugi Argument</th>
-                    <th>Wynik</th>
-                </tr>
-            </thead> 
-            <tbody id="HistoryTable"/>
-        </table>
-    </body>
+   <body onload="getHistory('HistoryTable');">
+    <h1>Historia Kalkulacji</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Pierwszy Argument</th>
+                <th>Operator</th>
+                <th>Drugi Argument</th>
+                <th>Wynik</th>
+            </tr>
+        </thead>
+        <tbody id="HistoryTable"></tbody>
+    </table>
+</body>
 </html>

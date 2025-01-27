@@ -2,27 +2,26 @@
 <html>
     <head>
         <title>Kalkulator</title>
+        <link rel="stylesheet" href="css/calculatorStyle.css" />
     </head>
-    <body>
-        <h1>Prosty Kalkulator</h1>
-        <form action="CalculatorServlet" method="get">
-            <label for="firstNumber">Pierwsza liczba:</label>
-            <input type="text" id="firstNumber" name="firstNumber" required><br><br>
+  <body>
+    <h1>Prosty Kalkulator</h1>
+    <form action="CalculatorServlet" method="get">
+        <label for="firstNumber">Pierwsza liczba:</label>
+        <input type="text" id="firstNumber" name="firstNumber" required>
 
-            <label for="operator">Operator (+, -, *, /):</label>
-            <select id="operator" name="operator" required>
-                <option value="+">+</option>
-                <option value="-">-</option>
-                <option value="*">*</option>
-                <option value="/">/</option>
-            </select>
-            <br><br>
+        <label for="operator">Operator:</label>
+        <select id="operator" name="operator" required>
+            <option value="+">+</option>
+            <option value="-">-</option>
+            <option value="*">*</option>
+            <option value="/">/</option>
+        </select>
 
+        <label for="secondNumber">Druga liczba:</label>
+        <input type="text" id="secondNumber" name="secondNumber" required>
 
-            <label for="secondNumber">Druga liczba:</label>
-            <input type="text" id="secondNumber" name="secondNumber" required><br><br>
-
-            <button type="submit">Oblicz</button>
-        </form>
-    </body>
+        <button type="submit">Oblicz</button>
+    </form>
+</body>
 </html>
