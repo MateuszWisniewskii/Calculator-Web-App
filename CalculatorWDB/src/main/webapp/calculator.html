@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Kalkulator</title>
+        <link rel="stylesheet" href="css/calculatorStyle.css" />
+    </head>
+  <body>
+    <h1>Kalkulator</h1>
+    <form action="CalculatorServlet" method="get">
+        <label for="firstNumber">Pierwsza liczba:</label>
+        <input type="text" id="firstNumber" name="firstNumber" required>
+
+        <label for="operator">Operator:</label>
+        <select id="operator" name="operator" required>
+            <option value="+">+</option>
+            <option value="-">-</option>
+            <option value="*">*</option>
+            <option value="/">/</option>
+            <option value="sqrt">Pierwiastek Kwadratowy</option>
+            <option value="log">Logarytm Naturalny</option>
+            <option value="sin">Sinus</option>
+            <option value="cos">Cosinus</option>
+            <option value="tan">Tangens</option>
+            <option value="cot">Cotangens</option>
+            <option value="pow">Potęgowanie</option>
+            <option value="mod">Modulo</option>
+        </select>
+
+        <label for="secondNumber">Druga liczba:</label>
+        <input type="text" id="secondNumber" name="secondNumber" required>
+
+        <button type="submit">Oblicz</button>
+    </form>
+</body>
+</html>

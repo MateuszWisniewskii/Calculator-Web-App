@@ -1,6 +1,7 @@
 package cherry.calculator.servlet;
 
-import cherry.calculator.model.CalculationData;
+
+import cherry.calculator.model.CalculationEntity;
 import cherry.calculator.model.CalculatorModel;
 import cherry.calculator.model.DataSource;
 import cherry.calculator.model.DivisionByZeroException;
@@ -15,10 +16,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * Servlet that handles calculation requests, performs the calculation, stores
- * the result, and displays it to the user. It also maintains a calculation
- * count using cookies.
- *
+ * Servlet that handles calculation requests, performs the calculation, 
+ * stores the result, and displays it to the user. It also maintains a 
+ * calculation count using cookies.
+ * 
  * @author Mateusz Wiśniewski
  */
 @WebServlet(name = "CalculatorServlet", urlPatterns = {"/CalculatorServlet"})
@@ -26,9 +27,8 @@ public class CalculatorServlet extends HttpServlet {
 
     /**
      * Processes both HTTP <code>GET</code> and <code>POST</code> requests.
-     * Performs calculations, validates input, stores results in the
-     * application's data source, and tracks the calculation count using
-     * cookies.
+     * Performs calculations, validates input, stores results in the application's data source, 
+     * and tracks the calculation count using cookies.
      *
      * @param request the HTTP request object
      * @param response the HTTP response object
@@ -39,30 +39,39 @@ public class CalculatorServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
 
-        // Retrieve or initialize the "calculationsCount" cookie
-        Cookie c = null;
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("calculationsCount".equals(cookie.getName())) {
-                    c = cookie;
-                    break;
-                }
-            }
-        }
 
-        // Set the ID based on the cookie value or start from 1 if no cookie exists
-        int id = (c == null) ? 1 : Integer.parseInt(c.getValue()) + 1;
 
         // Retrieve the application's data source from the servlet context
         ServletContext context = request.getServletContext();
         DataSource dataSource = (DataSource) context.getAttribute("DataSource");
 
+        // Pobieranie największego ID z bazy danych
+        int maxId = dataSource.getMaxId();
+
+        // Pobieranie ID z ciasteczek
+        int cookieId = 0;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("calculationsCount".equals(cookie.getName())) {
+                    try {
+                        cookieId = Integer.parseInt(cookie.getValue());
+                    } catch (NumberFormatException e) {
+                        cookieId = 0;
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Obliczanie nowego ID
+        int newId = maxId + 1;
+        
         // Get parameters from the request
         String firstNumberParam = request.getParameter("firstNumber");
         String secondNumberParam = request.getParameter("secondNumber");
         String operator = request.getParameter("operator");
-        PrintWriter out = response.getWriter();
+ PrintWriter out = response.getWriter();
         try {
             // Validate the parameters
             if (firstNumberParam == null || secondNumberParam == null || operator == null) {
@@ -85,17 +94,17 @@ public class CalculatorServlet extends HttpServlet {
             CalculatorModel calculator = new CalculatorModel(firstNumber, secondNumber, operator);
 
             // Store the result in the application's data source
-            CalculationData calculationData = new CalculationData(
-                    id,
-                    calculator.getFirstNumber(),
-                    calculator.getSecondNumber(),
-                    calculator.getResultNumber(),
-                    calculator.getOperator()
-            );
-            dataSource.persistObject(calculationData);
+            CalculationEntity calculationEntity = new CalculationEntity();
+            calculationEntity.setId(newId);
+            calculationEntity.setFirstNumber(calculator.getFirstNumber());
+            calculationEntity.setSecondNumber(calculator.getSecondNumber());
+            calculationEntity.setResultNumber(calculator.getResultNumber());
+            calculationEntity.setOperator(calculator.getOperator());
+            
+            dataSource.persistObject(calculationEntity);
 
             // Add or update the "calculationsCount" cookie
-            response.addCookie(new Cookie("calculationsCount", Integer.toString(id)));
+            response.addCookie(new Cookie("calculationsCount", Integer.toString(newId)));
 
             // Generate the response with the result
             out.println("<!DOCTYPE html>");
@@ -120,15 +129,15 @@ public class CalculatorServlet extends HttpServlet {
             out.println("</body>");
             out.println("</html>");
 
-        } catch (Exception e) {
+        }catch (Exception e) {
             response.getWriter().println("<h1>An error occurred: " + e.getMessage() + "</h1>");
         }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
-     * Handles the HTTP <code>GET</code> method. Forwards the request to
-     * {@link #processRequest(HttpServletRequest, HttpServletResponse)}.
+     * Handles the HTTP <code>GET</code> method.
+     * Forwards the request to {@link #processRequest(HttpServletRequest, HttpServletResponse)}.
      *
      * @param request the HTTP request object
      * @param response the HTTP response object
@@ -142,8 +151,8 @@ public class CalculatorServlet extends HttpServlet {
     }
 
     /**
-     * Handles the HTTP <code>POST</code> method. Forwards the request to
-     * {@link #processRequest(HttpServletRequest, HttpServletResponse)}.
+     * Handles the HTTP <code>POST</code> method.
+     * Forwards the request to {@link #processRequest(HttpServletRequest, HttpServletResponse)}.
      *
      * @param request the HTTP request object
      * @param response the HTTP response object
