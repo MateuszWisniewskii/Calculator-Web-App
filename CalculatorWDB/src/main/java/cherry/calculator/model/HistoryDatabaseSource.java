@@ -85,5 +85,21 @@ public class HistoryDatabaseSource implements DataSource {
         }    
         return true;
     }
+    
+        public List<CalculationEntity> getEvenCalculation() {
+        List<CalculationEntity> calulationList = null;
+     EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        try {
+            Query query = em.createQuery("SELECT p FROM CalculationEntity p WHERE MOD(p.id,2) = 0");
+            calulationList = query.getResultList();
+        } catch (PersistenceException e) {
+            e.printStackTrace(); // replace with proper message for the client
+            em.getTransaction().rollback();
+        } finally {
+            em.close();
+        }
+        return calulationList;
+    }
 
 }

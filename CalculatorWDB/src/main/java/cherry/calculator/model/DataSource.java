@@ -38,4 +38,6 @@ public interface DataSource {
 
     public int getMaxId();
 
+    public Iterable<CalculationEntity> getEvenCalculation();
+
 }
